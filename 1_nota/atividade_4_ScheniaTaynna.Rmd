@@ -1,0 +1,128 @@
+---
+title: "Atividade 4 - Modelos de Regressão Linear Simples aplicado ao banco de dados do consumo de combustível"
+author: "Schênia Taynna Medeiros Silva - 20190156798"
+date: "2023-08-14"
+output:
+  pdf_document: default
+subtitle: 'Disciplina: Regressão I'
+---
+
+## Dados sobre o consumo de combustível
+
+Os dados da *Tabela B.3* do livro do Montgomery podem ser encontrados no pacote MPV do R como o nome table.b3. Estes dados consistem de 32 obsevações sobre sobre o consumo de combustível de diferentes automóveis, com variáveis sobre o desempenho da quilometragem da gasolina e características físicas e/ou de performance.
+
+y = Consumo de combustível em Milhas/galão (do inglês Miles/gallon);
+
+x1 = Cilindrada ou volume de deslocamento do motor (cubic in.) (do inglês Engine displacement);
+
+x2 = Cavalos de potência (do inglês Horsepower);
+
+x3 = Torque (ft-lb);
+
+x4 = Taxa de compressão (do inglês Compression ratio);
+
+x5 = Razão do eixo traseiro (do inglês Rear axle ratio);
+
+x6 = Número de carburadores (do inglês Carburetor (barrels));
+
+x7 = Velocidades de transmissão (do inglês No. of transmission speeds);
+
+x8 = Comprimento total (in.) (do inglês Overall length);
+
+x9 = Largura (in.) (do inglês Width);
+
+x10 = Peso (lbs)(do inglês Weight);
+
+x11 = Tipo de transmissão (1=automática, 0=manual) (do inglês Transmission).
+
+Considerando estes dados e fixando o nível de significância em 5%, responda as questões abaixo:
+
+
+a)  Estime um modelo de regressão linear que relaciona o consumo de combustível em milhas/galão, y, com o volume de deslocamento do motor (cilindrada), x1 (in3). 
+Expresse o modelo estimado e interprete os parâmetros destes modelos.
+
+```{r}
+#library('MPV') # Biblioteca do pacote 
+dados <- MPV::table.b3 # Dados
+modelo <- lm(y~x1, data = dados) #  Ajustar o modelo de regressão linear simples
+summary(modelo) # Resultado
+```
+
+
+A inclinação da reta é -0.0473, com a redução esperada no consumo de combustível em milhas/galão ao acrescimo de uma unidade no volume de deslocamento do motor. 
+
+Dessa forma, conforme o volume de deslocamento do moto aumenta, há uma redução de 0.047 no consumo médio de combustível.
+Já O intercepto obtido é 33.72, é representado como valor esperado
+do consumo de combustível quando o volume de deslocamento do motor estiver igual a 0.
+
+
+b) Construa a tabela ANOVA para o modelo estimado e explique cada um dos resultados da tabela e conclua sobre a significância da regressão.
+
+```{r}
+anova(modelo)
+```
+Ao realtizar a análise de variância (ANOVA) utilizamos o teste F para verificar se existe uma relação significativa entre a variável resposta (consumo de combustível) e a variável preditora (volume de deslocamento do motor). 
+
+Dessa forma, obtendo o valor F  de 101.74 e o valor p associado ao F (3.743e-11) confirma que há uma relação estatisticamente significativa entre o consumo de combustível e o volume de deslocamento do motor (x1). Também podemos avaliar o p-valor (3.743e-11) como um
+O valor extremamente baixo, assim indicando que há uma forte evidência estatística de que o volume de deslocamento do motor afeta significativamente o consumo de combustível. 
+
+
+
+
+
+c) Qual o percentual da variabilidade total do consumo de combustível é explicado por esse modelo?
+
+```{r}
+summary(modelo)
+```
+
+Obtemos que o percentual da variabilidade total do consumo de combustível explicado por esse modelo ajustado é de 77,23%
+
+
+d) Construa um intervalo de confiança para o consumo médio de combustível se a cilindrada é de 275 in^3
+
+```{r}
+predict(modelo,newdata=data.frame(x1=275), level = 0.90, interval="confidence")
+```
+
+Dessa forma, obtemos que o valor esperado do consumo médio de combustível é 20.699 quando a cilindrada (volume de deslocamento do motor) atinge 275, com um intervalo de confiança variando de 19.77 a 21.62.
+
+
+
+e) Suponha que desejamos prever o consumo de combustível obtidos de carros com 275 in^3
+cilindradas.
+Qual a estimativa pontual para este consumo? Calcule o intervalo de predição para o consumo de combustível, com 95% de confiança.
+
+
+```{r}
+predict(modelo,newdata=data.frame(x1=275), level = 0.95, interval="prediction")
+
+```
+
+O consumo de combustível obtidos de carros com 275 in^3 cilindradas, está entre aproximadamente 14.34 e 27.06, com 95% de confiança.
+
+
+f) Compare os dois intervalos obtidos em (d) e (e). Explique a diferença entre eles. Qual deles é o maior,e por quê?
+
+A diferença entre é :
+
+o intervalo de confiança se concentra na média da população, enquanto o intervalo de predição considera a variabilidade geral dos dados e a incerteza na previsão de valores individuais.Por isso que o intervalo de predição  é maior!
+
+
+g) Ajuste agora um modelo de regressão linear que relaciona a variável consumo de combustível em milhas/galão, y, com o peso do carro, x10.
+
+
+```{r}
+modelo_2 <- lm(y~x10, data = dados) #  Ajustar o modelo de regressão linear simples
+summary(modelo_2) # Resultado
+```
+
+
+h) Considere agora o modelo de regressão linear que relaciona o consumo de combustível, y, com o comprimento total do veículo, x8, e o seu peso, x10. Baseado na comparação dos dois modelos, qual das variáveis regressoras podemos concluir que é a melhor? Justifique, apresentando os resultados.
+
+
+```{r}
+modelo_3 <- lm(y~ x8+ x10, data = dados) #  Ajustar o modelo de regressão linear simples
+summary(modelo_3) # Resultado
+```
+
