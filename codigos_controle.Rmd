@@ -1,0 +1,116 @@
+---
+title: "Exercícios"
+output:
+  pdf_document: default
+  html_document: default
+date: '2023-08-30'
+---
+
+## Desempenho do gráfico de controle 
+
+Quando o processo está sob controle é:
+
+ARL_0 = round(1/alpha, 0) 
+
+Quando o processo fora de controle é:
+
+ARL_1 = round(1/1-beta, 0) 
+
+
+## Regras para os Gráficos de Controle Shewhart
+
+1. Um ou mais pontos fora dos limites de controle.
+2. Dois, de três pontos consecutivos, fora dos limites de alerta (2-sigma).
+3. Quatro, de cinco pontos consecutivos, além dos limites 1-sigma.
+4. Uma sequência de oito pontos consecutivos de um mesmo lado da
+linha central.
+5. Seis pontos de uma sequência em tendência crescente ou
+decrescente.
+6. Quinze pontos em sequência na faixa entre  1-sigma.
+7. Quatorze pontos em sequência alternadamente para cima e para baixo.
+8. Oito pontos em sequência de ambos os lados da linha central, com
+nenhum deles acima de 3-sigma.
+9. Um padrão não-usual ou não aleatório nos dados.
+10. Um ou mais pontos perto dos limites de alerta ou de controle.
+
+
+## Exercício
+
+Em uma fábrica de anéis de pistão para motores de automóveis,
+uma característica crítica da qualidade é o diâmetro interno doanel. O processo pode ser controlado em um diâmetro interno médio de 74 mm, e sabe-se que o desvio padrão do diâmetro doanel é de 0,01 mm. Considere que o diâmetro do anel é normalmente distribuído, e que o tamanho da amostra é n=5.
+
+a) Determine os limites de controle dois-sigma.
+
+```{r}
+mu_0 = 74 # média
+sigma_0 = 0.01 #desvio padrão
+n = 5 # tamnho da amostra
+
+L = 2 # dois sigma
+# supondo uma normalidade
+alpha = 2*pnorm(L, lower.tail = F) # a probabilidade de um ponto cair fora dos limites  
+
+#precisamos do resultado disso: 
+LIC = mu_0 - L*sigma_0/sqrt(n) #limite de alerta inferior
+LSC = mu_0 + L*sigma_0/sqrt(n) #limite de alerta superior 
+
+cat("o limite inferior é:", LIC)
+cat("o limite superior é:", LSC)
+
+alpha; LIC; LSC
+```
+
+b) Suponha que tenha sido sugerido o limite de dois-sigma, em vezdos limites típicos de três-sigma. Que efeito o uso dos limitesdois-sigma teria sobre o ARL sob controle do gráfico?
+
+```{r}
+
+ARL_0 = round(1/alpha, 0) 
+```
+
+
+## Exemplo Resolvido - Aula 3
+
+– Anéis de pistão para motores de automóveis são fabricadospor um processo. Deseja-se estabelecer um controleestatístico para o diâmetro interno dos anéis. – 25 amostras (m), cada uma de tamanho 5 (n), foram extraídasquando o mesmo estava sob controle. – As medidas são exibidas a seguir
+
+
+### Para xbarra R
+
+```{r}
+library(qcc)
+data(pistonrings)
+attach(pistonrings)
+diameter <- qcc.groups(diameter, sample)
+# Gráfico para a amplitude (R)
+qcc(diameter[1:25,], type="R")
+qcc(diameter[1:25,], type="R", newdata=diameter[26:40,])
+
+
+# Construindo a carta para a média
+qcc(diameter[1:25,], type="xbar")
+qcc(diameter[1:25,], type="xbar", newdata=diameter[26:40,])
+q <- qcc(diameter[1:25,], type="xbar", newdata=diameter[26:40,], plot=FALSE)
+plot(q, chart.all=FALSE)
+qcc(diameter[1:25,], type="xbar", newdata=diameter[26:40,], nsigmas=2) # limites 2-sigmaqcc(diameter[1:25,], type="xbar", newdata=diameter[26:40,], confidence.level=0.99) 
+# confiança de 99%
+
+
+# Incluindo os limites 2-sigma
+q <- qcc(diameter[1:25,], type="xbar", newdata=diameter[26:40,], plot=FALSE)
+plot(q, restore.par = FALSE)
+(warn.limits <- limits.xbar(q$center, q$std.dev, q$sizes, 2))
+abline(h = warn.limits, lty = 3, col = "chocolate")
+
+```
+
+
+### Para xbarra s
+```{r}
+# Gráfico para o desvio padrão (S)
+qcc(diameter[1:25,], type="S")
+qcc(diameter[1:25,], type="S", newdata=diameter[26:40,])
+
+# Gráfico para a média
+qcc(diameter[1:25,], type="xbar", newdata=diameter[26:40,])
+```
+
+
